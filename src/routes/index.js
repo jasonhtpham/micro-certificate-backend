@@ -3,9 +3,9 @@ import UserBaseRoute from "./userRoute/userBaseRoute";
 import AdminBaseRoute from "./adminRoute/adminBaseRoute";
 import UploadBaseRoute from "./uploadRoute/uploadBaseRoute";
 
-import AdminCreateCertRoute from "./adminRoute/adminCreateCertRoute";
+import AdminCertRoute from "./adminRoute/adminCertRoute";
 
 
-const Routes = [].concat(DemoBaseRoute, UserBaseRoute, AdminBaseRoute, UploadBaseRoute, AdminCreateCertRoute);
+const Routes = [].concat(DemoBaseRoute, UserBaseRoute, AdminBaseRoute, UploadBaseRoute, AdminCertRoute);
 
 export default Routes;

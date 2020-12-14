@@ -31,7 +31,7 @@ const adminGetAllCerts = {
       }
     }
   }
-}
+};
 
 const adminCreateCert = {
   method: "POST",
@@ -41,15 +41,14 @@ const adminCreateCert = {
     tags: ["api", "admin", "certificate"],
     handler: (request, h) => {
       return new Promise((resolve, reject) => {
-        Controller.AdminCreateCertController.adminCreateCert(
+        Controller.AdminCertController.adminCreateCert(
           request.payload,
           (error, data) => {
             if (error) reject(UniversalFunctions.sendError(error));
             else {
               resolve(UniversalFunctions.sendSuccess(null, data));
             }
-          }
-        );
+          });
       });
     },
     validate: {
@@ -63,19 +62,19 @@ const adminCreateCert = {
         period: Joi.string().trim().required(),
         provider: Joi.string().trim().required(),
       }).label("Admin: Create Certificate"),
-      failAction: UniversalFunctions.failActionFunction,
+      failAction: UniversalFunctions.failActionFunction
     },
     plugins: {
       "hapi-swagger": {
         responseMessages:
-          UniversalFunctions.CONFIG.APP_CONSTANTS
-            .swaggerDefaultResponseMessages,
-      },
-    },
-  },
+          UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+      }
+    }
+  }
 };
 
-export default {
-  adminGetAllCerts,
-  adminCreateCert,
-};
+export default [
+  // adminGetAllCerts,
+  adminCreateCert
+];
+  
