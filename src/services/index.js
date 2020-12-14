@@ -8,5 +8,5 @@ export default {
   UserService: new GenericService('User'),
   ForgetPasswordService,
   AdminService: new GenericService('Admin'),
-  // HyperledgerService: new HyperledgerService
+  HyperledgerService: new HyperledgerService
 };

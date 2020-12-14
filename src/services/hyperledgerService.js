@@ -33,7 +33,7 @@ export default class HyperledgerService {
                 const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
         
                 // Create a new file system based wallet for managing identities.
-                const walletPath = path.join(__dirname, 'wallet');
+                const walletPath = path.join(__dirname, '..', 'wallet');
                 wallet = await Wallets.newFileSystemWallet(walletPath);
                 console.log(`Wallet path: ${walletPath}`);
         
@@ -87,6 +87,7 @@ export default class HyperledgerService {
     GetAllCerts = async () => {
         // Get the certificates stored on ledger
         try {
+            console.log("Hello from HL GetAllCerts")
             let result = await contract.evaluateTransaction('GetAllCerts');
             return prettyJSONString(result.toString());
         } catch (err) {

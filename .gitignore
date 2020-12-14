@@ -42,3 +42,6 @@ package-lock.json
 
 logfile
 vcap-local.json
+
+# fabric wallet
+wallet/

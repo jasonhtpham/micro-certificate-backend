@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const adminUserId = 'admin';
 const adminUserPasswd = 'adminpw';
-const walletPath = path.join(__dirname, 'wallet');
+const walletPath = path.join(__dirname, '..', 'wallet');
 
 async function enrollAdminUser() {
     try {

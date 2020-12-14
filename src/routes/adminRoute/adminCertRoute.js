@@ -4,22 +4,22 @@ import Controller from "../../controllers";
 
 const adminGetAllCerts = {
   method: "GET",
-  path: 'api/admin/getAllCerts',
-  handler: (request, h) => {
-    return new Promise((resolve, reject) => {
-      Controller.AdminCertController.adminGetAllCerts(
-        (error, data) => {
-          if (error) reject(UniversalFunctions.sendError(error));
-          else {
-            resolve(UniversalFunctions.sendSuccess(null, data));
-          }
-        }
-      );
-    });
-  },
+  path: '/api/admin/getAllCerts',
   options: {
     description: "Admin get all certificates",
     tags: ["api", "admin", "certificate"],
+    handler: (request, h) => {
+      return new Promise((resolve, reject) => {
+        Controller.AdminCertController.adminGetAllCerts(
+          (error, data) => {
+            if (error) reject(UniversalFunctions.sendError(error));
+            else {
+              resolve(UniversalFunctions.sendSuccess(null, data));
+            }
+          }
+        );
+      });
+    },
     validate: {
       failAction: UniversalFunctions.failActionFunction
     },
@@ -74,7 +74,7 @@ const adminCreateCert = {
 };
 
 export default [
-  // adminGetAllCerts,
+  adminGetAllCerts,
   adminCreateCert
 ];
   
