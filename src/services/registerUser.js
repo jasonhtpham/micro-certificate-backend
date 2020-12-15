@@ -35,15 +35,15 @@ async function registerAppUser() {
         // Check to see if we've already enrolled the user.
         const userIdentity = await wallet.get(applicationUserId);
         if (userIdentity) {
-            console.log(`An identity for the user ${applicationUserId} already exists in the wallet`);
+            fabricLogger.info(`An identity for the user ${applicationUserId} already exists in the wallet`);
             return;
         }
 
         // Check to see if we've already enrolled the admin user.
         const adminIdentity = await wallet.get(enrollAdmin.AdminUserId);
         if (!adminIdentity) {
-            console.log('An identity for the admin user does not exist in the wallet');
-            console.log('Run the enrollAdmin.js application before retrying');
+            fabricLogger.info('An identity for the admin user does not exist in the wallet');
+            fabricLogger.info('Run the enrollAdmin.js application before retrying');
             return;
         }
 
@@ -71,7 +71,7 @@ async function registerAppUser() {
             type: 'X.509',
         };
         await wallet.put(applicationUserId, x509Identity);
-        console.log(`Successfully registered and enrolled user ${applicationUserId} and imported it into the wallet`);
+        fabricLogger.info(`Successfully registered and enrolled user ${applicationUserId} and imported it into the wallet`);
 
     } catch (error) {
         console.error(`Failed to register user : ${error}`);

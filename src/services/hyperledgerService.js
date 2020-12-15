@@ -35,7 +35,7 @@ export default class HyperledgerService {
                 // Create a new file system based wallet for managing identities.
                 const walletPath = path.join(__dirname, '..', 'wallet');
                 wallet = await Wallets.newFileSystemWallet(walletPath);
-                console.log(`Wallet path: ${walletPath}`);
+                fabricLogger.info(`Wallet path: ${walletPath}`);
         
         
                 // 1. register & enroll admin user with CA, stores admin identity in local wallet
@@ -47,7 +47,7 @@ export default class HyperledgerService {
                 // Check to see if app user exist in wallet.
                 const identity = await wallet.get(registerUser.ApplicationUserId);
                 if (!identity) {
-                    console.log(`An identity for the user does not exist in the wallet: ${registerUser.ApplicationUserId}`);
+                    fabricLogger.info(`An identity for the user does not exist in the wallet: ${registerUser.ApplicationUserId}`);
                     return;
                 }
         
@@ -67,42 +67,42 @@ export default class HyperledgerService {
                     contract = network.getContract(myChaincodeName);
 
                     // Initialize the chaincode by calling its InitLedger function
-                    // console.log('Submit Transaction: InitLedger to create the very first cert');
+                    // fabricLogger.info('Submit Transaction: InitLedger to create the very first cert');
                     // await contract.submitTransaction('InitLedger');
                 } catch (err) {
-                    console.log(err);
+                    fabricLogger.info(err);
                 }
             }
 
             if (wallet && contract) {
-                console.log('Chaincode is ready to be invoked');
+                fabricLogger.info('Chaincode is ready to be invoked');
             } else {
                 throw new Error("Cannot connect with Fabric")
             }
         } catch (err) {
-            console.log(err);
+            fabricLogger.info(err);
         }
     }
 
     GetAllCerts = async () => {
         // Get the certificates stored on ledger
         try {
-            console.log("Hello from HL GetAllCerts")
             let result = await contract.evaluateTransaction('GetAllCerts');
+            fabricLogger.info("Hello from HL GetAllCerts", prettyJSONString(result.toString()))
             return prettyJSONString(result.toString());
         } catch (err) {
-            console.log(`Error when get all certificates: ${err}`);
+            fabricLogger.info(`Error when get all certificates: ${err}`);
         }
     }
 
     CreateCert = async (id, unitCode, mark, name, studentID, credit, period, provider) => {
-        console.log('Submit Transaction: CreateCert() Create a new certificate');
+        fabricLogger.info('Submit Transaction: CreateCert() Create a new certificate');
         try {
             // Return the successful payload if the transaction is committed without errors
             const result = await contract.submitTransaction('CreateCert', id, unitCode, mark, name, studentID, credit, period, provider);
             return prettyJSONString(result.toString());
         } catch (err) {
-            console.log(`Error when create certificate: ${err}`);
+            fabricLogger.info(`Error when create certificate: ${err}`);
 
             // Return errors if any
             return err;
@@ -111,33 +111,33 @@ export default class HyperledgerService {
 
     GetCertsByOwner = async (name, studentID) => {
         // Query certs by name and studentID
-        console.log('Evaluate Transaction: QueryCertsByOwner()');
+        fabricLogger.info('Evaluate Transaction: QueryCertsByOwner()');
         try {
             const result = await contract.evaluateTransaction('QueryCertsByOwner', name, studentID);
             return prettyJSONString(result.toString());
         } catch (err) {
-            console.log(`Error when get certificates by name and studentID: ${err}`);
+            fabricLogger.info(`Error when get certificates by name and studentID: ${err}`);
         }
     }
 
     GetCertHistory = async (certId) => {
-        console.log('Evaluate Transaction: GetCertHistory()');
+        fabricLogger.info('Evaluate Transaction: GetCertHistory()');
         try {
             const result = await contract.evaluateTransaction('GetCertHistory', certId);
             return prettyJSONString(result.toString());
         } catch (err) {
-            console.log(`Error when get certificate's history': ${err}`);
+            fabricLogger.info(`Error when get certificate's history': ${err}`);
         }
     }
 
     UpdateCert = async (id, unitCode, mark, name, studentID, credit, period) => {
-        console.log('Submit Transaction: UpdateCert() Update certificate');
+        fabricLogger.info('Submit Transaction: UpdateCert() Update certificate');
         try {
             // Return the successful payload if the transaction is committed without errors
             const result = await contract.submitTransaction('UpdateCert', id, unitCode, mark, name, studentID, credit, period);
             return prettyJSONString(result.toString());
         } catch (err) {
-            console.log(`Error when create certificate: ${err}`);
+            fabricLogger.info(`Error when create certificate: ${err}`);
 
             // Return errors if any
             return err;

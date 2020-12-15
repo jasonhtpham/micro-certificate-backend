@@ -12,6 +12,9 @@ const adminGetAllCerts = {
       return new Promise((resolve, reject) => {
         Controller.AdminCertController.adminGetAllCerts(
           (error, data) => {
+            appLogger.info("ERROR sent back from Controller to getAllCerts endpoint", error)
+            appLogger.info("DATA sent back from Controller to getAllCerts endpoint", data)
+
             if (error) reject(UniversalFunctions.sendError(error));
             else {
               resolve(UniversalFunctions.sendSuccess(null, data));

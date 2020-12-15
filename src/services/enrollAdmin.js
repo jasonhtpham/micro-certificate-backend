@@ -35,7 +35,7 @@ async function enrollAdminUser() {
         // Check to see if we've already enrolled the admin user.
         const identity = await wallet.get(adminUserId);
         if (identity) {
-            console.log('An identity for the admin user already exists in the wallet');
+            fabricLogger.info('An identity for the admin user already exists in the wallet');
             return;
         }
 
@@ -50,7 +50,7 @@ async function enrollAdminUser() {
             type: 'X.509',
         };
         await wallet.put(adminUserId, x509Identity);
-        console.log('Successfully enrolled admin user and imported it into the wallet');
+        fabricLogger.info('Successfully enrolled admin user and imported it into the wallet');
 
     } catch (error) {
         console.error(`Failed to enroll admin user : ${error}`);

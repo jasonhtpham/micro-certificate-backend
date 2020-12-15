@@ -3,19 +3,21 @@ import async from "async";
 import UniversalFunctions from "../../utils/universalFunctions";
 
 const adminGetAllCerts = (callback) => {
-    // console.log("Hello from GACerts")
     let certList = [];
     async.series([
         function (cb) {
+        
             Service.HyperledgerService.GetAllCerts()
-            .then(data => {
-                // console.log(data);
-                certList = data;
+            .then(allCerts => {
+                certList = allCerts
+                appLogger.info("[allCerts]", certList);
                 cb();
-            })
-            .catch(err => cb(err))
+            });
+                
         },
         function (err, result) {
+            appLogger.info("Callback function getAllCerts controller | Error: ", err)
+            appLogger.info("Callback function getAllCerts controller | Result: ", result)
             if (err) callback(err)
             else callback(null, { data: certList })
         }
@@ -23,7 +25,7 @@ const adminGetAllCerts = (callback) => {
 }
 
 const adminCreateCert = (payload, callback) => {
-    // console.log(payload);
+    console.log(payload);
 }
 
 export default {
