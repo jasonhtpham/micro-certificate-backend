@@ -14,14 +14,15 @@ const adminGetAllCerts = (callback) => {
                 cb();
             });
                 
-        },
-        function (err, result) {
-            appLogger.info("Callback function getAllCerts controller | Error: ", err)
-            appLogger.info("Callback function getAllCerts controller | Result: ", result)
-            if (err) callback(err)
-            else callback(null, { data: certList })
         }
-    ])
+        
+    ],
+    function (err, result) {
+        appLogger.info("Callback function getAllCerts controller | Error: ", err)
+        appLogger.info("Callback function getAllCerts controller | Result: ", result)
+        if (err) callback(err)
+        else callback(null, { data: certList })
+    })
 }
 
 const adminCreateCert = (payload, callback) => {

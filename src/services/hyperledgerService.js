@@ -85,7 +85,7 @@ export default class HyperledgerService {
     }
 
     GetAllCerts = async () => {
-        // Get the certificates stored on ledger
+
         try {
             let result = await contract.evaluateTransaction('GetAllCerts');
             fabricLogger.info("Hello from HL GetAllCerts", prettyJSONString(result.toString()))
