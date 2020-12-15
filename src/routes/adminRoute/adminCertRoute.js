@@ -12,9 +12,7 @@ const adminGetAllCerts = {
       return new Promise((resolve, reject) => {
         Controller.AdminCertController.adminGetAllCerts(
           (error, data) => {
-            appLogger.info("ERROR sent back from Controller to getAllCerts endpoint", error)
-            appLogger.info("DATA sent back from Controller to getAllCerts endpoint", data)
-
+            // appLogger.info("Data sent back to getAllCerts endpoint: ", data);
             if (error) reject(UniversalFunctions.sendError(error));
             else {
               resolve(UniversalFunctions.sendSuccess(null, data));
@@ -47,6 +45,7 @@ const adminCreateCert = {
         Controller.AdminCertController.adminCreateCert(
           request.payload,
           (error, data) => {
+            // appLogger.info("Data sent back to createCert endpoint: ", data);
             if (error) reject(UniversalFunctions.sendError(error));
             else {
               resolve(UniversalFunctions.sendSuccess(null, data));
@@ -63,7 +62,6 @@ const adminCreateCert = {
         mark: Joi.number().min(1).max(100).required(),
         credit: Joi.number().min(0).max(2).required(),
         period: Joi.string().trim().required(),
-        provider: Joi.string().trim().required(),
       }).label("Admin: Create Certificate"),
       failAction: UniversalFunctions.failActionFunction
     },

@@ -46,6 +46,7 @@ export default class HyperledgerService {
         
                 // Check to see if app user exist in wallet.
                 const identity = await wallet.get(registerUser.ApplicationUserId);
+
                 if (!identity) {
                     fabricLogger.info(`An identity for the user does not exist in the wallet: ${registerUser.ApplicationUserId}`);
                     return;
@@ -88,24 +89,26 @@ export default class HyperledgerService {
 
         try {
             let result = await contract.evaluateTransaction('GetAllCerts');
-            fabricLogger.info("Hello from HL GetAllCerts", prettyJSONString(result.toString()))
             return prettyJSONString(result.toString());
         } catch (err) {
             fabricLogger.info(`Error when get all certificates: ${err}`);
         }
     }
 
-    CreateCert = async (id, unitCode, mark, name, studentID, credit, period, provider) => {
+    CreateCert = async (id, unitCode, mark, name, studentID, credit, period) => {
         fabricLogger.info('Submit Transaction: CreateCert() Create a new certificate');
         try {
+            const identity = await wallet.get(registerUser.ApplicationUserId);
+
+            const provider = identity.mspId;
+            // fabricLogger.info(`Provider ${provider.mspId}`);
+
+
             // Return the successful payload if the transaction is committed without errors
             const result = await contract.submitTransaction('CreateCert', id, unitCode, mark, name, studentID, credit, period, provider);
             return prettyJSONString(result.toString());
         } catch (err) {
             fabricLogger.info(`Error when create certificate: ${err}`);
-
-            // Return errors if any
-            return err;
         }
     }
 
