@@ -89,9 +89,11 @@ export default class HyperledgerService {
 
         try {
             let result = await contract.evaluateTransaction('GetAllCerts');
-            return prettyJSONString(result.toString());
+            // return prettyJSONString(result.toString());
+            return JSON.parse(result);
         } catch (err) {
             fabricLogger.info(`Error when get all certificates: ${err}`);
+            return err;
         }
     }
 
@@ -106,9 +108,12 @@ export default class HyperledgerService {
 
             // Return the successful payload if the transaction is committed without errors
             const result = await contract.submitTransaction('CreateCert', id, unitCode, mark, name, studentID, credit, period, provider);
-            return prettyJSONString(result.toString());
+            // return prettyJSONString(result.toString());
+            return JSON.parse(result);
+
         } catch (err) {
             fabricLogger.info(`Error when create certificate: ${err}`);
+            return err;
         }
     }
 

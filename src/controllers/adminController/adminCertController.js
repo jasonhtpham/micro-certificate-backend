@@ -1,6 +1,8 @@
 import Service from '../../services';
 import async from "async";
 import UniversalFunctions from "../../utils/universalFunctions";
+const ERROR = UniversalFunctions.CONFIG.APP_CONSTANTS.STATUS_MSG.ERROR;
+
 
 const adminGetAllCerts = (callback) => {
     let certList = [];
@@ -22,7 +24,6 @@ const adminGetAllCerts = (callback) => {
 
 const adminCreateCert = (payload, callback) => {
     const {unitCode, mark, firstName, lastName, studentID, credit, period} = payload
-    let newCert;
     
     const name = firstName + ' ' + lastName;
 
@@ -37,15 +38,14 @@ const adminCreateCert = (payload, callback) => {
         function (cb) {
             Service.HyperledgerService.CreateCert(id, unitCode, mark, name, studentID, credit, period)
             .then(addedCert => {
-                newCert = addedCert;
-                appLogger.info("[newCert]", newCert);
-                cb();
+                if (!addedCert || addedCert.errors) cb(ERROR.DUPLICATE)
+                else cb()
             });
         }
     ],
     function (err, result) {
         if (err) callback(err)
-        else callback(null, { data: newCert })
+        else callback(null, `Certificate ${id} has been successfully created` )
     })
 }
 

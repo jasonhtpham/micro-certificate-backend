@@ -48,7 +48,7 @@ const adminCreateCert = {
             // appLogger.info("Data sent back to createCert endpoint: ", data);
             if (error) reject(UniversalFunctions.sendError(error));
             else {
-              resolve(UniversalFunctions.sendSuccess(null, data));
+              resolve(UniversalFunctions.sendSuccess(data, null));
             }
           });
       });
