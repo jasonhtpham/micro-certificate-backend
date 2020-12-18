@@ -162,9 +162,9 @@ var STATUS_MSG = {
       customMessage: "Otp code not found for this user",
       type: "OTP_CODE_NOT_FOUND"
     },
-    NOT_FOUND: {
+    FILE_NOT_FOUND: {
       statusCode: 400,
-      customMessage: "User Not Found",
+      customMessage: "File Not Found",
       type: "NOT_FOUND"
     },
     WRONG_PASSWORD: {

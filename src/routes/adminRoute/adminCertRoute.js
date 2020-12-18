@@ -40,6 +40,46 @@ const adminGetAllCerts = {
   }
 };
 
+const adminGetCertsByUser = {
+  method: "GET",
+  path: '/api/admin/getCertsByUser',
+  options: {
+    description: "Admin get certificates by user",
+    tags: ["api", "admin", "certificate"],
+    auth: "UserAuth",
+    handler: (request, h) => {
+      let userData =
+      (request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.userData) || null;
+      let studentId = request.query.studentId;
+      return new Promise((resolve, reject) => {
+        Controller.AdminCertController.adminGetCertsByUser(userData, studentId, (error, data) => {
+            // appLogger.info("Data sent back to getAllCerts endpoint: ", data);
+            if (error) reject(UniversalFunctions.sendError(error));
+            else {
+              resolve(UniversalFunctions.sendSuccess(null, data));
+            }
+          }
+        );
+      });
+    },
+    validate: {
+      // payload: Joi.object({
+      //   studentId: Joi.string().pattern(new RegExp('^[0-9]{9}$')).required()
+      // }).label("Admin: Get Certificates by user"),
+      failAction: UniversalFunctions.failActionFunction
+    },
+    plugins: {
+      "hapi-swagger": {
+        security: [{ 'admin': {} }],
+        responseMessages:
+          UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+      }
+    }
+  }
+};
+
 const adminCreateCert = {
   method: "POST",
   path: "/api/admin/createCert",
@@ -89,6 +129,7 @@ const adminCreateCert = {
 
 export default [
   adminGetAllCerts,
+  adminGetCertsByUser,
   adminCreateCert
 ];
   
