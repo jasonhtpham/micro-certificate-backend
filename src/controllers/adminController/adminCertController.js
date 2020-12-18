@@ -42,28 +42,28 @@ const adminGetAllCerts = (userData, callback) => {
     })
 }
 
-const adminGetCertsByUser = (studentId, callback) => {
+const adminGetCertsByUser = (userData, studentId, callback) => {
     let certList = [];
     let userFound = false;
     let userName = "";
 
     async.series([
-        // function (cb) {
-        //     var criteria = {
-        //       _id: userData._id
-        //     };
-        //     Service.AdminService.getRecord(criteria, { password: 0 }, {}, function (err, data) {
-        //       if (err) cb(err);
-        //       else {
-        //         if (data.length == 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
-        //         else {
-        //           userFound = (data && data[0]) || null;
-        //           if (userFound.isBlocked == true) cb(ERROR.ACCOUNT_BLOCKED)
-        //           else cb()
-        //         }
-        //       }
-        //     });
-        // },
+        function (cb) {
+            var criteria = {
+              _id: userData._id
+            };
+            Service.AdminService.getRecord(criteria, { password: 0 }, {}, function (err, data) {
+              if (err) cb(err);
+              else {
+                if (data.length == 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+                else {
+                  userFound = (data && data[0]) || null;
+                  if (userFound.isBlocked == true) cb(ERROR.ACCOUNT_BLOCKED)
+                  else cb()
+                }
+              }
+            });
+        },
         function (cb) {
             var criteria = {
                 studentId: studentId
