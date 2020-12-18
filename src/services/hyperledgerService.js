@@ -82,6 +82,7 @@ export default class HyperledgerService {
             }
         } catch (err) {
             fabricLogger.info(err);
+            return err;
         }
     }
 
@@ -138,11 +139,11 @@ export default class HyperledgerService {
         }
     }
 
-    UpdateCert = async (id, unitCode, mark, name, studentID, credit, period) => {
-        fabricLogger.info('Submit Transaction: UpdateCert() Update certificate');
+    RevokeCert = async (id) => {
+        fabricLogger.info('Submit Transaction: RevokeCert() Revoke certificate');
         try {
             // Return the successful payload if the transaction is committed without errors
-            const result = await contract.submitTransaction('UpdateCert', id, unitCode, mark, name, studentID, credit, period);
+            const result = await contract.submitTransaction('RevokeCert', id);
             return prettyJSONString(result.toString());
         } catch (err) {
             fabricLogger.info(`Error when create certificate: ${err}`);

@@ -40,6 +40,11 @@ var STATUS_MSG = {
       customMessage: 'DB Error : ',
       type: 'DB_ERROR'
     },
+    FABRIC_ERROR: {
+      statusCode: 400,
+      customMessage: 'Hyperledger Fabric Error : ',
+      type: 'FABRIC_ERROR'
+    },
     INVALID_ID: {
       statusCode: 400,
       customMessage: 'Invalid id provided : ',

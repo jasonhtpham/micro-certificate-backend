@@ -130,7 +130,7 @@ const adminGetCertHistory = (userData, certId, callback) => {
       function (cb) {
           Service.HyperledgerService.GetCertHistory(certId)
           .then( history => {
-              if (history.length == 0) cb(ERR.FILE_NOT_FOUND);
+              if (history.length == 0 || !history) cb(ERR.FILE_NOT_FOUND);
               certHistory = history
               cb();
           })
@@ -214,9 +214,44 @@ const adminCreateCert = (userData, payloadData, callback) => {
     })
 }
 
+const adminRevokeCert = (userData, payloadData, callback) => {
+  let userFound = false;
+  
+  async.series([
+      function (cb) {
+          var criteria = {
+            _id: userData._id
+          };
+          Service.AdminService.getRecord(criteria, { password: 0 }, {}, function (err, data) {
+            if (err) cb(err);
+            else {
+              if (data.length == 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+              else {
+                userFound = (data && data[0]) || null;
+                if (userFound.isBlocked == true) cb(ERROR.ACCOUNT_BLOCKED)
+                else cb()
+              }
+            }
+          });
+      },
+      function (cb) {
+          Service.HyperledgerService.RevokeCert(payloadData.certId)
+          .then(result => {
+            if (!result || result.errors) cb(ERROR.FABRIC_ERROR);
+            cb()
+          });
+      }
+  ],
+  function (err, result) {
+      if (err) callback(err)
+      else callback(null, `Certificate ${payloadData.certId} has been successfully revoked` )
+  })
+}
+
 export default {
     adminGetAllCerts,
     adminGetCertsByUser,
     adminGetCertHistory,
-    adminCreateCert
+    adminCreateCert,
+    adminRevokeCert
 }

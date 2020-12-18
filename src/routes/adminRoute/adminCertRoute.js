@@ -65,9 +65,6 @@ const adminGetCertsByUser = {
       });
     },
     validate: {
-      // payload: Joi.object({
-      //   studentId: Joi.string().pattern(new RegExp('^[0-9]{9}$')).required()
-      // }).label("Admin: Get Certificates by user"),
       failAction: UniversalFunctions.failActionFunction
     },
     plugins: {
@@ -163,10 +160,53 @@ const adminCreateCert = {
   }
 };
 
+const adminRevokeCert = {
+  method: "POST",
+  path: "/api/admin/revokeCert",
+  options: {
+    description: "Admin Revoke Certificate",
+    tags: ["api", "admin", "certificate"],
+    auth: "UserAuth",
+    handler: (request, h) => {
+      let userData =
+      (request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.userData) ||
+      null;
+      let payloadData = request.payload;
+      return new Promise((resolve, reject) => {
+        Controller.AdminCertController.adminRevokeCert(
+          userData,
+          payloadData,
+          (error, data) => {
+            if (error) reject(UniversalFunctions.sendError(error));
+            else {
+              resolve(UniversalFunctions.sendSuccess(data, null));
+            }
+          });
+      });
+    },
+    validate: {
+      payload: Joi.object({
+        certId: Joi.string().pattern(new RegExp('^[0-9]{9}_[A-Z]{3}[0-9]{3}$')).required(),
+      }).label("Admin: Revoke Certificate"),
+      failAction: UniversalFunctions.failActionFunction
+    },
+    plugins: {
+      "hapi-swagger": {
+        security: [{ 'admin': {} }],
+        responseMessages:
+          UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+      }
+    }
+  }
+};
+
 export default [
   adminGetAllCerts,
   adminGetCertsByUser,
   adminGetCertHistory,
-  adminCreateCert
+  adminCreateCert,
+  adminRevokeCert
 ];
   
