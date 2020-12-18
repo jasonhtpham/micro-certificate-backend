@@ -32,6 +32,7 @@ const userRegister = {
     },
     validate: {
       payload: Joi.object({
+        studentId: Joi.string().pattern(new RegExp('^[0-9]{9}$')).required(),
         firstName: Joi.string().regex(/^[a-zA-Z ]+$/).trim().min(2).required(),
         lastName: Joi.string().regex(/^[a-zA-Z ]+$/).trim().min(2).required(),
         emailId: Joi.string().required(),

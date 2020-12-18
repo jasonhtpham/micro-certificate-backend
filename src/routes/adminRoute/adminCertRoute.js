@@ -1,6 +1,7 @@
 import UniversalFunctions from "../../utils/universalFunctions";
 import Joi from "joi";
 import Controller from "../../controllers";
+import user from "../../models/user";
 
 const adminGetAllCerts = {
   method: "GET",
@@ -8,10 +9,15 @@ const adminGetAllCerts = {
   options: {
     description: "Admin get all certificates",
     tags: ["api", "admin", "certificate"],
+    auth: "UserAuth",
     handler: (request, h) => {
+      let userData =
+      (request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.userData) ||
+      null;
       return new Promise((resolve, reject) => {
-        Controller.AdminCertController.adminGetAllCerts(
-          (error, data) => {
+        Controller.AdminCertController.adminGetAllCerts(userData, (error, data) => {
             // appLogger.info("Data sent back to getAllCerts endpoint: ", data);
             if (error) reject(UniversalFunctions.sendError(error));
             else {
@@ -26,7 +32,7 @@ const adminGetAllCerts = {
     },
     plugins: {
       "hapi-swagger": {
-        // security: [{ 'admin': {} }],
+        security: [{ 'admin': {} }],
         responseMessages:
           UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
       }
@@ -40,10 +46,18 @@ const adminCreateCert = {
   options: {
     description: "Admin Create Certificate",
     tags: ["api", "admin", "certificate"],
+    auth: "UserAuth",
     handler: (request, h) => {
+      let userData =
+      (request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.userData) ||
+      null;
+      let payloadData = request.payload;
       return new Promise((resolve, reject) => {
         Controller.AdminCertController.adminCreateCert(
-          request.payload,
+          userData,
+          payloadData,
           (error, data) => {
             // appLogger.info("Data sent back to createCert endpoint: ", data);
             if (error) reject(UniversalFunctions.sendError(error));
@@ -55,10 +69,8 @@ const adminCreateCert = {
     },
     validate: {
       payload: Joi.object({
-        studentID: Joi.number().min(100000000).max(999999999).required(),
-        firstName: Joi.string().trim().required(),
-        lastName: Joi.string().trim().required(),
-        unitCode: Joi.string().alphanum().pattern(/^[A-Z]{3}[0-9]{3}$/).trim().required(),
+        studentId: Joi.string().pattern(new RegExp('^[0-9]{9}$')).required(),
+        unitCode: Joi.string().alphanum().pattern(new RegExp('^[A-Z]{3}[0-9]{3}$')).trim().required(),
         mark: Joi.number().min(1).max(100).required(),
         credit: Joi.number().min(0).max(2).required(),
         period: Joi.string().trim().required(),
@@ -67,6 +79,7 @@ const adminCreateCert = {
     },
     plugins: {
       "hapi-swagger": {
+        security: [{ 'admin': {} }],
         responseMessages:
           UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
       }

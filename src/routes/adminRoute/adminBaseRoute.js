@@ -253,6 +253,9 @@ const createUser = {
     auth: "UserAuth",
     validate: {
       payload: Joi.object({
+        studentId: Joi.string()
+        .pattern(new RegExp('^[0-9]{9}$'))
+        .required(),
         firstName: Joi.string()
           .regex(/^[a-zA-Z ]+$/)
           .trim()

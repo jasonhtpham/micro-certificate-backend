@@ -4,9 +4,27 @@ import UniversalFunctions from "../../utils/universalFunctions";
 const ERROR = UniversalFunctions.CONFIG.APP_CONSTANTS.STATUS_MSG.ERROR;
 
 
-const adminGetAllCerts = (callback) => {
+const adminGetAllCerts = (userData, callback) => {
     let certList = [];
+    let userFound = false;
+    
     async.series([
+        function (cb) {
+            var criteria = {
+              _id: userData._id
+            };
+            Service.AdminService.getRecord(criteria, { password: 0 }, {}, function (err, data) {
+              if (err) cb(err);
+              else {
+                if (data.length == 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+                else {
+                  userFound = (data && data[0]) || null;
+                  if (userFound.isBlocked == true) cb(ERROR.ACCOUNT_BLOCKED)
+                  else cb()
+                }
+              }
+            });
+        },
         function (cb) {
             Service.HyperledgerService.GetAllCerts()
             .then(allCerts => {
@@ -22,21 +40,65 @@ const adminGetAllCerts = (callback) => {
     })
 }
 
-const adminCreateCert = (payload, callback) => {
-    const {unitCode, mark, firstName, lastName, studentID, credit, period} = payload
+const adminCreateCert = (userData, payloadData, callback) => {
+    const {studentId, unitCode, mark, credit, period} = payloadData
     
-    const name = firstName + ' ' + lastName;
 
-    // certID = studentID_unitCode
-    const processedStudentID = studentID.toString().trim()
+    // certID is created in the form of studentID_unitCode
+    const processedStudentId = studentId.toString().trim()
     
     const upperCaseUnitCode = unitCode.trim().toUpperCase();
 
-    const id = processedStudentID + "_" + upperCaseUnitCode;
+    const id = processedStudentId + "_" + upperCaseUnitCode;
+
+    let userFound;
+    let userName;
     
     async.series([
         function (cb) {
-            Service.HyperledgerService.CreateCert(id, unitCode, mark, name, studentID, credit, period)
+            var criteria = {
+              _id: userData._id
+            };
+            Service.AdminService.getRecord(criteria, { password: 0 }, {}, function (err, data) {
+              if (err) cb(err);
+              else {
+                if (data.length == 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+                else {
+                  userFound = (data && data[0]) || null;
+                  if (userFound.isBlocked == true) cb(ERROR.ACCOUNT_BLOCKED)
+                  else cb()
+                }
+              }
+            });
+        },
+        function (cb) {
+            var criteria = {
+              studentId: payloadData.studentId
+            };
+            var projection = {
+                password: 0,
+                accessToken: 0,
+                OTPCode: 0,
+                code: 0,
+                codeUpdatedAt: 0,
+                __v: 0,
+                registrationDate: 0
+            }
+            Service.UserService.getRecord(criteria, projection, {}, function (err, data) {
+              if (err) cb(err);
+              else {
+                if (data.length == 0) cb(ERROR.USER_NOT_FOUND);
+                else {
+                  const firstName = data[0].firstName;
+                  const lastName = data[0].lastName;
+                  userName = firstName + ' ' + lastName;
+                  cb()
+                }
+              }
+            });
+        },
+        function (cb) {
+            Service.HyperledgerService.CreateCert(id, unitCode, mark, userName, studentId, credit, period)
             .then(addedCert => {
                 if (!addedCert || addedCert.errors) cb(ERROR.DUPLICATE)
                 else cb()
