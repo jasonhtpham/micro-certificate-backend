@@ -80,6 +80,42 @@ const adminGetCertsByUser = {
   }
 };
 
+const adminGetCertHistory = {
+  method: "GET",
+  path: '/api/admin/getCertHistory',
+  options: {
+    description: "Admin get certificate's history",
+    tags: ["api", "admin", "certificate"],
+    auth: "UserAuth",
+    handler: (request, h) => {
+      let userData =
+      (request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.userData) || null;
+      let certId = request.query.certId;
+      return new Promise((resolve, reject) => {
+        Controller.AdminCertController.adminGetCertHistory(userData, certId, (error, data) => {
+            if (error) reject(UniversalFunctions.sendError(error));
+            else {
+              resolve(UniversalFunctions.sendSuccess(null, data));
+            }
+          }
+        );
+      });
+    },
+    validate: {
+      failAction: UniversalFunctions.failActionFunction
+    },
+    plugins: {
+      "hapi-swagger": {
+        security: [{ 'admin': {} }],
+        responseMessages:
+          UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+      }
+    }
+  }
+};
+
 const adminCreateCert = {
   method: "POST",
   path: "/api/admin/createCert",
@@ -130,6 +166,7 @@ const adminCreateCert = {
 export default [
   adminGetAllCerts,
   adminGetCertsByUser,
+  adminGetCertHistory,
   adminCreateCert
 ];
   

@@ -107,6 +107,42 @@ const adminGetCertsByUser = (userData, studentId, callback) => {
     })
 }
 
+const adminGetCertHistory = (userData, certId, callback) => {
+  let certHistory = null;
+
+  async.series([
+      function (cb) {
+          var criteria = {
+            _id: userData._id
+          };
+          Service.AdminService.getRecord(criteria, { password: 0 }, {}, function (err, data) {
+            if (err) cb(err);
+            else {
+              if (data.length == 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+              else {
+                userFound = (data && data[0]) || null;
+                if (userFound.isBlocked == true) cb(ERROR.ACCOUNT_BLOCKED)
+                else cb()
+              }
+            }
+          });
+      },
+      function (cb) {
+          Service.HyperledgerService.GetCertHistory(certId)
+          .then( history => {
+              if (history.length == 0) cb(ERR.FILE_NOT_FOUND);
+              certHistory = history
+              cb();
+          })
+          .catch( err => cb(err) )
+      }
+  ],
+  function (err, result) {
+      if (err) callback(err)
+      else callback(null, { data: certHistory })
+  })
+}
+
 const adminCreateCert = (userData, payloadData, callback) => {
     const {studentId, unitCode, mark, credit, period} = payloadData
     
@@ -181,5 +217,6 @@ const adminCreateCert = (userData, payloadData, callback) => {
 export default {
     adminGetAllCerts,
     adminGetCertsByUser,
+    adminGetCertHistory,
     adminCreateCert
 }
