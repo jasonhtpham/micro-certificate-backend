@@ -42,7 +42,7 @@ const adminGetAllCerts = {
 
 const adminGetCertsByUser = {
   method: "GET",
-  path: '/api/admin/getCertsByUser',
+  path: '/api/admin/getCertsByUser/{studentId}',
   options: {
     description: "Admin get certificates by user",
     tags: ["api", "admin", "certificate"],
@@ -52,7 +52,7 @@ const adminGetCertsByUser = {
       (request.auth &&
         request.auth.credentials &&
         request.auth.credentials.userData) || null;
-      let studentId = request.query.studentId;
+      let studentId = request.params.studentId;
       return new Promise((resolve, reject) => {
         Controller.AdminCertController.adminGetCertsByUser(userData, studentId, (error, data) => {
             // appLogger.info("Data sent back to getAllCerts endpoint: ", data);
@@ -65,6 +65,9 @@ const adminGetCertsByUser = {
       });
     },
     validate: {
+      params: Joi.object({
+        studentId: Joi.string().pattern(new RegExp('^[0-9]{9}$')).required(),
+      }).label("Admin: Get Certificates by User"),
       failAction: UniversalFunctions.failActionFunction
     },
     plugins: {
