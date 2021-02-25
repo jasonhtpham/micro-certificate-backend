@@ -123,7 +123,7 @@ export default class HyperledgerService {
         fabricLogger.info('Evaluate Transaction: QueryCertsByOwner()');
         try {
             const result = await contract.evaluateTransaction('QueryCertsByOwner', name, studentID);
-            return prettyJSONString(result.toString());
+            return JSON.parse(result);
         } catch (err) {
             fabricLogger.info(`Error when get certificates by name and studentID: ${err}`);
         }
@@ -133,7 +133,7 @@ export default class HyperledgerService {
         fabricLogger.info('Evaluate Transaction: GetCertHistory()');
         try {
             const result = await contract.evaluateTransaction('GetCertHistory', certId);
-            return prettyJSONString(result.toString());
+            return JSON.parse(result);
         } catch (err) {
             fabricLogger.info(`Error when get certificate's history': ${err}`);
         }
