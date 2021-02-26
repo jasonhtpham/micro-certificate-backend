@@ -82,7 +82,7 @@ const adminGetCertsByUser = {
 
 const adminGetCertHistory = {
   method: "GET",
-  path: '/api/admin/getCertHistory',
+  path: '/api/admin/getCertHistory/{certId}',
   options: {
     description: "Admin get certificate's history",
     tags: ["api", "admin", "certificate"],
@@ -92,7 +92,7 @@ const adminGetCertHistory = {
       (request.auth &&
         request.auth.credentials &&
         request.auth.credentials.userData) || null;
-      let certId = request.query.certId;
+      let certId = request.params.certId;
       return new Promise((resolve, reject) => {
         Controller.AdminCertController.adminGetCertHistory(userData, certId, (error, data) => {
             if (error) reject(UniversalFunctions.sendError(error));
@@ -104,6 +104,9 @@ const adminGetCertHistory = {
       });
     },
     validate: {
+      params: Joi.object({
+        certId: Joi.string().pattern(new RegExp('^[0-9]{9}_[A-Z]{3}[0-9]{3}$')).required(),
+      }).label("Admin: Get Certificate History"),
       failAction: UniversalFunctions.failActionFunction
     },
     plugins: {

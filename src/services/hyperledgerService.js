@@ -139,11 +139,11 @@ export default class HyperledgerService {
         }
     }
 
-    RevokeCert = async (id) => {
+    RevokeCert = async (certId) => {
         fabricLogger.info('Submit Transaction: RevokeCert() Revoke certificate');
         try {
             // Return the successful payload if the transaction is committed without errors
-            const result = await contract.submitTransaction('RevokeCert', id);
+            const result = await contract.submitTransaction('RevokeCert', certId);
             return prettyJSONString(result.toString());
         } catch (err) {
             fabricLogger.info(`Error when create certificate: ${err}`);

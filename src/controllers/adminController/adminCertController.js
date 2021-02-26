@@ -109,6 +109,7 @@ const adminGetCertsByUser = (userData, studentId, callback) => {
 
 const adminGetCertHistory = (userData, certId, callback) => {
   let certHistory = null;
+  let userFound = false;
 
   async.series([
       function (cb) {
