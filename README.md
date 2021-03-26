@@ -101,3 +101,12 @@ $ npm run deployment
 ```
 
 The current version of your application would be running on **http://localhost:8000** or **http://IP_OF_SERVER:8000** (in case you are running on the server)
+
+
+## Disable authentication
+
+1. Get rid of the security option on Hapi in Controller
+
+2. Remove the `Auth` property in request options
+
+3. Remove the first call back in the relevant controller (that first callback's function is to check authentication)

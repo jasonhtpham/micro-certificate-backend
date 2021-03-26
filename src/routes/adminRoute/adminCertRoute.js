@@ -9,7 +9,7 @@ const adminGetAllCerts = {
   options: {
     description: "Admin get all certificates",
     tags: ["api", "admin", "certificate"],
-    auth: "UserAuth",
+    // auth: "UserAuth",
     handler: (request, h) => {
       let userData =
       (request.auth &&
@@ -32,7 +32,7 @@ const adminGetAllCerts = {
     },
     plugins: {
       "hapi-swagger": {
-        security: [{ 'admin': {} }],
+        // security: [{ 'admin': {} }],
         responseMessages:
           UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
       }
