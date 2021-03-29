@@ -46,7 +46,7 @@ const adminGetCertsByUser = {
   options: {
     description: "Admin get certificates by user",
     tags: ["api", "admin", "certificate"],
-    auth: "UserAuth",
+    // auth: "UserAuth",
     handler: (request, h) => {
       let userData =
       (request.auth &&
@@ -72,7 +72,7 @@ const adminGetCertsByUser = {
     },
     plugins: {
       "hapi-swagger": {
-        security: [{ 'admin': {} }],
+        // security: [{ 'admin': {} }],
         responseMessages:
           UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
       }
@@ -86,7 +86,7 @@ const adminGetCertHistory = {
   options: {
     description: "Admin get certificate's history",
     tags: ["api", "admin", "certificate"],
-    auth: "UserAuth",
+    // auth: "UserAuth",
     handler: (request, h) => {
       let userData =
       (request.auth &&
@@ -111,7 +111,7 @@ const adminGetCertHistory = {
     },
     plugins: {
       "hapi-swagger": {
-        security: [{ 'admin': {} }],
+        // security: [{ 'admin': {} }],
         responseMessages:
           UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
       }
@@ -125,7 +125,7 @@ const adminCreateCert = {
   options: {
     description: "Admin Create Certificate",
     tags: ["api", "admin", "certificate"],
-    auth: "UserAuth",
+    // auth: "UserAuth",
     handler: (request, h) => {
       let userData =
       (request.auth &&
@@ -158,7 +158,7 @@ const adminCreateCert = {
     },
     plugins: {
       "hapi-swagger": {
-        security: [{ 'admin': {} }],
+        // security: [{ 'admin': {} }],
         responseMessages:
           UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
       }
@@ -172,7 +172,7 @@ const adminRevokeCert = {
   options: {
     description: "Admin Revoke Certificate",
     tags: ["api", "admin", "certificate"],
-    auth: "UserAuth",
+    // auth: "UserAuth",
     handler: (request, h) => {
       let userData =
       (request.auth &&
@@ -200,7 +200,7 @@ const adminRevokeCert = {
     },
     plugins: {
       "hapi-swagger": {
-        security: [{ 'admin': {} }],
+        // security: [{ 'admin': {} }],
         responseMessages:
           UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
       }
