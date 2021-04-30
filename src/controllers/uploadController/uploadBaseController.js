@@ -12,9 +12,10 @@
  */
 
 import UniversalFunctions from "../../utils/universalFunctions";
+import Service from '../../services';
+import CONFIG from "../../config";
 
 var UploadManager = require("../../lib/uploadManager");
-var CONFIG = require("../../config");
 var async = require("async");
 var ERROR = UniversalFunctions.CONFIG.APP_CONSTANTS.STATUS_MSG.ERROR;
 
@@ -90,6 +91,7 @@ var uploadVideo = function (payloadData, callback) {
 }
 
 var uploadDocument = function (payloadData, callback) {
+  console.log(CONFIG.AWS_S3_CONFIG);
   var documentFileUrl;
   var documentFile = payloadData.documentFile
   if (payloadData.documentFile && payloadData.documentFile.filename) {
@@ -114,6 +116,14 @@ var uploadDocument = function (payloadData, callback) {
       else {
         cb()
       }
+    },
+    function (cb) {
+      Service.HyperledgerService.CreateCert(documentFileUrl.original)
+      .then(addedCert => {
+        if (!addedCert || addedCert.errors) cb(ERROR.DUPLICATE)
+        else cb()
+      })
+      .catch( err => cb(err) );
     }
   ], function (err, result) {
     if (err) callback(err)
