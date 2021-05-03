@@ -114,7 +114,8 @@ const uploadDocument =
       maxBytes: 20715200,
       output: 'stream',
       parse: true,
-      allow: 'multipart/form-data'
+      allow: 'multipart/form-data',
+      multipart: true
     },
     validate: {
       payload: Joi.object({

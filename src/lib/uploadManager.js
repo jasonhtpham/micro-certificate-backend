@@ -9,8 +9,9 @@
 * - FATAL - ‘magenta’
 */
 
-var CONFIG = require('../config');
-var UniversalFunctions = require('../utils/universalFunctions');
+import CONFIG from '../config';
+import UniversalFunctions from "../utils/universalFunctions";
+
 var async = require('async');
 var Path = require('path');
 var knox = require('knox');
@@ -60,6 +61,9 @@ var uploadImageToS3Bucket = function uploadImageToS3Bucket(file, isThumb, callba
     };
     //<------ End of Configuration for ibm bucket -------------->
     uploadLogger.info("path to read::" + path + filename);
+
+    var s3bucket = new AWS.S3(ibms3Config);
+
     fs.readFile(path + filename, function (error, fileBuffer) {
         uploadLogger.info("path to read from temp::" + path + filename);
         if (error) {
@@ -74,7 +78,6 @@ var uploadImageToS3Bucket = function uploadImageToS3Bucket(file, isThumb, callba
             return callback(errResp);
         }
 
-        var s3bucket = new AWS.S3(ibms3Config);
         var params = {
             Bucket: CONFIG.AWS_S3_CONFIG.s3BucketCredentials.bucket,
             Key: folder + '/' + filename,
@@ -83,8 +86,11 @@ var uploadImageToS3Bucket = function uploadImageToS3Bucket(file, isThumb, callba
             ContentType: mimeType
         };
 
+        console.log(s3bucket);
+
         s3bucket.putObject(params, function (err, data) {
             if (err) {
+                console.log("Error is: ", err);
                 var error = {
                     response: {
                         message: "Something went wrong",
@@ -104,6 +110,7 @@ var uploadImageToS3Bucket = function uploadImageToS3Bucket(file, isThumb, callba
                 })
             }
         });
+
     });
 };
 
@@ -373,11 +380,11 @@ function uploadfileWithoutThumbnail(docFile, folder, filename, callbackParent) {
 
         function (error) {
             if (error) {
-                uploadLogger.error("upload image error :: ", error);
+                uploadLogger.error("upload file error :: ", error);
                 callbackParent(error);
             }
             else {
-                uploadLogger.info("upload image result :", urls);
+                uploadLogger.info("upload file result :", urls);
                 callbackParent(null, urls);
             }
         })
