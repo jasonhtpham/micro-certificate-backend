@@ -128,13 +128,13 @@ export default class HyperledgerService {
             // calculate Hash from the specified file
             // const fileLoaded = fs.readFileSync(filename, 'utf8');
             const hashedDoc = CryptoJS.SHA256(docToHash).toString();
-            console.log("Hash of the file: " + hashedDoc);
+            // console.log("Hash of the file: " + hashedDoc);
 
             // get signature to sign
             const identity = await wallet.get(registerUser.ApplicationUserId);
             const userPk = identity.credentials.privateKey;
 
-            console.log({userPk})
+            // console.log({userPk})
 
             // sign file
             const sig = new KJUR.crypto.Signature({"alg": "SHA256withECDSA"});
@@ -142,19 +142,42 @@ export default class HyperledgerService {
             sig.updateHex(hashedDoc);
             const sigValueHex = sig.sign();
             const sigValueBase64 = Buffer.from(sigValueHex, 'hex').toString('base64');
-            console.log("Signature: " + sigValueBase64);
+            // console.log("Signature: " + sigValueBase64);
+
+            const timestamp = Date.now();
 
             // Return the successful payload if the transaction is committed without errors
-            // const result = await contract.submitTransaction('CreateCert', hashedDoc, sigValueBase64);
-            console.log(`HyperledgerService: ${hashedDoc, sigValueBase64}`);
-
-            // return prettyJSONString(result.toString());
-            // return JSON.parse(result);
+            const result = await contract.submitTransaction('CreateCert', hashedDoc, sigValueBase64, timestamp);
+            
+            return JSON.parse(result);
 
         } catch (err) {
             fabricLogger.info(`Error when create certificate: ${err}`);
             return err;
         }
+    }
+
+    VerifyCert = async (docToVerify) => {
+        // get user certificate to verify doc
+        const user = registerUser.ApplicationUserId;
+        const identity = await wallet.get(user);
+        const userCert = identity.credentials.certificate;
+
+        const hashedDoc = CryptoJS.SHA256(docToVerify).toString();
+
+        const result = await contract.evaluateTransaction('ReadCert', hashedDoc);
+        console.log("Transaction has been evaluated");
+        const resultJSON = JSON.parse(result);
+        console.log("Doc record found, created by " + resultJSON.timestamp);
+
+        const userPublicKey = KEYUTIL.getKey(userCert);
+        const recover = new KJUR.crypto.Signature({"alg": "SHA256withECDSA"});
+        recover.init(userPublicKey);
+        recover.updateHex(hashedDoc);
+        const getBackSigValueHex = Buffer.from(resultJSON.signature, 'base64').toString('hex');
+        // console.log("Signature verified with certificate provided: " + recover.verify(getBackSigValueHex));
+        return recover.verify(getBackSigValueHex);
+
     }
 
     GetCertsByOwner = async (name, studentID) => {
