@@ -239,6 +239,7 @@ const adminVerifyCert = {
     validate: {
       payload: Joi.object({
         documentFile: Joi.string(),
+        issuer: Joi.string(),
       }).label("Admin: Create Certificate"),
       failAction: UniversalFunctions.failActionFunction
     },
