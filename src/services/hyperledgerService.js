@@ -157,27 +157,34 @@ export default class HyperledgerService {
         }
     }
 
-    VerifyCert = async (docToVerify) => {
+    VerifyCert = async (docToVerify, issuerName) => {
         // get user certificate to verify doc
-        const user = registerUser.ApplicationUserId;
-        const identity = await wallet.get(user);
-        const userCert = identity.credentials.certificate;
-
-        const hashedDoc = CryptoJS.SHA256(docToVerify).toString();
-
-        const result = await contract.evaluateTransaction('ReadCert', hashedDoc);
-        console.log("Transaction has been evaluated");
-        const resultJSON = JSON.parse(result);
-        console.log("Doc record found, created by " + resultJSON.timestamp);
-
-        const userPublicKey = KEYUTIL.getKey(userCert);
-        const recover = new KJUR.crypto.Signature({"alg": "SHA256withECDSA"});
-        recover.init(userPublicKey);
-        recover.updateHex(hashedDoc);
-        const getBackSigValueHex = Buffer.from(resultJSON.signature, 'base64').toString('hex');
-        // console.log("Signature verified with certificate provided: " + recover.verify(getBackSigValueHex));
-        return recover.verify(getBackSigValueHex);
-
+        // const user = registerUser.ApplicationUserId;
+        try {
+            const identity = await wallet.get(issuerName);
+            const userCert = identity.credentials.certificate;
+    
+            if (!userCert || userCert == undefined){
+                return new Error("Issuer not found");
+            }
+    
+            const hashedDoc = CryptoJS.SHA256(docToVerify).toString();
+    
+            const result = await contract.evaluateTransaction('ReadCert', hashedDoc);
+            console.log("Transaction has been evaluated");
+            const resultJSON = JSON.parse(result);
+            console.log("Doc record found, created by " + resultJSON.timestamp);
+    
+            const userPublicKey = KEYUTIL.getKey(userCert);
+            const recover = new KJUR.crypto.Signature({"alg": "SHA256withECDSA"});
+            recover.init(userPublicKey);
+            recover.updateHex(hashedDoc);
+            const getBackSigValueHex = Buffer.from(resultJSON.signature, 'base64').toString('hex');
+            // console.log("Signature verified with certificate provided: " + recover.verify(getBackSigValueHex));
+            return recover.verify(getBackSigValueHex);
+        } catch (err) {
+            fabricLogger.info(`Verification error: ${err}`);
+        }
     }
 
     GetCertsByOwner = async (name, studentID) => {

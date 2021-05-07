@@ -236,9 +236,9 @@ const adminVerifyCert = (userData, payloadData, callback) => {
     
     async.series([
         function (cb) {
-            Service.HyperledgerService.VerifyCert(payloadData.documentFile)
+            Service.HyperledgerService.VerifyCert(payloadData.documentFile, payloadData.issuer)
             .then(certAdded => {
-                if (!certAdded || certAdded.errors) cb(ERROR.DEFAULT)
+                if (!certAdded || certAdded.errors) cb(ERROR.USER_NOT_FOUND)
                 const message = "This certificate is verified!!!";
                 cb(null, message)
             });
