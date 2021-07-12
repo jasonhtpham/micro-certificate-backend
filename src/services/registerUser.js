@@ -6,17 +6,29 @@
 
 'use strict';
 
+import 'dotenv/config';
+
 const { Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const fs = require('fs');
 const path = require('path');
 const enrollAdmin = require('./enrollAdmin');
 const caChaincodeUserRole = 'client';
-const applicationUserId = 'appUser';
 const walletPath = path.join(__dirname, '..', 'wallet');
 
-async function registerAppUser() {
+const CA_ADDRESS = process.env.CA_ADDRESS;
+const MSP_ID = process.env.MSP_ID;
+
+const ADMIN_ID = process.env.CA_ADMIN_ID;
+
+
+// const applicationUserId = 'appUser';
+let applicationUserId;
+
+async function registerAppUser(userId) {
     try {
+        applicationUserId = userId;
+
         // load the network configuration
         const ccpPath = path.resolve(__dirname, '..', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
         const fileExists = fs.existsSync(ccpPath);
@@ -26,7 +38,7 @@ async function registerAppUser() {
         const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
 
         // Create a new CA client for interacting with the CA.
-        const caURL = ccp.certificateAuthorities['ca.org1.example.com'].url;
+        const caURL = ccp.certificateAuthorities[CA_ADDRESS].url;
         const ca = new FabricCAServices(caURL);
 
         // Create a new file system based wallet for managing identities.        ;
@@ -40,7 +52,7 @@ async function registerAppUser() {
         }
 
         // Check to see if we've already enrolled the admin user.
-        const adminIdentity = await wallet.get(enrollAdmin.AdminUserId);
+        const adminIdentity = await wallet.get(ADMIN_ID);
         if (!adminIdentity) {
             fabricLogger.info('An identity for the admin user does not exist in the wallet');
             fabricLogger.info('Run the enrollAdmin.js application before retrying');
@@ -49,7 +61,7 @@ async function registerAppUser() {
 
         // build a user object for authenticating with the CA
         const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
-        const adminUser = await provider.getUserContext(adminIdentity, enrollAdmin.AdminUserId);
+        const adminUser = await provider.getUserContext(adminIdentity, ADMIN_ID);
 
         // Register the user, enroll the user, and import the new identity into the wallet.
         // if affiliation is specified by client, the affiliation value must be configured in CA
@@ -58,6 +70,7 @@ async function registerAppUser() {
             enrollmentID: applicationUserId,
             role: caChaincodeUserRole
         }, adminUser);
+
         const enrollment = await ca.enroll({
             enrollmentID: applicationUserId,
             enrollmentSecret: secret
@@ -67,7 +80,7 @@ async function registerAppUser() {
                 certificate: enrollment.certificate,
                 privateKey: enrollment.key.toBytes(),
             },
-            mspId: 'Org1MSP',
+            mspId: MSP_ID,
             type: 'X.509',
         };
         await wallet.put(applicationUserId, x509Identity);
@@ -80,4 +93,4 @@ async function registerAppUser() {
 }
 
 exports.ApplicationUserId = applicationUserId;
-exports.RegisterAppUser = registerAppUser;
+export default registerAppUser;

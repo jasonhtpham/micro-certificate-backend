@@ -1,5 +1,7 @@
 'use strict';
 
+import 'dotenv/config';
+
 const {Gateway, Wallets} = require('fabric-network');
 const path = require('path');
 const fs = require('fs');
@@ -7,8 +9,11 @@ const fs = require('fs');
 const { KJUR, KEYUTIL } = require('jsrsasign');
 const CryptoJS = require('crypto-js');
 
-const registerUser = require('./registerUser');
-const enrollAdmin = require('./enrollAdmin');
+// const registerUser = require('./registerUser');
+// const enrollAdmin = require('./enrollAdmin');
+
+// const myChannel = process.env.CHANNEL;
+// const myChaincodeName = process.env.CHAINCODE;
 
 const myChannel = 'mychannel';
 const myChaincodeName = 'cert';
@@ -21,11 +26,17 @@ const prettyJSONString = (inputString) => {
 }
 
 export default class HyperledgerService {
-    constructor() {
-        this.InitLedger();
-    }
+    // constructor() {
+    //     this.InitLedger();
+    // }
 
-    InitLedger = async () => {
+    /**
+     * @author Jason Pham
+     * 
+     * @param {String} userId the hyperledger app userId that was registered with CA (should be user.emailId)
+     * @returns 
+     */
+    ConnectHyperledgerGateWay = async (userId) => {
         try {
             if (!wallet) {
                 // load the network configuration
@@ -43,16 +54,18 @@ export default class HyperledgerService {
         
         
                 // 1. register & enroll admin user with CA, stores admin identity in local wallet
-                await enrollAdmin.EnrollAdminUser();
+                // await enrollAdmin.EnrollAdminUser();
         
                 // 2. register & enroll application user with CA, which is used as client identify to make chaincode calls, stores app user identity in local wallet
-                await registerUser.RegisterAppUser();
+                // await registerUser.RegisterAppUser();
         
                 // Check to see if app user exist in wallet.
-                const identity = await wallet.get(registerUser.ApplicationUserId);
+                const identity = await wallet.get(userId);
+
+                console.log({userId});
 
                 if (!identity) {
-                    fabricLogger.info(`An identity for the user does not exist in the wallet: ${registerUser.ApplicationUserId}`);
+                    fabricLogger.info(`An identity for the user does not exist in the wallet: ${userId}`);
                     return;
                 }
         
@@ -61,9 +74,12 @@ export default class HyperledgerService {
                 const gateway = new Gateway();
                 await gateway.connect(ccp, {
                     wallet,
-                    identity: registerUser.ApplicationUserId,
+                    identity: identity,
                     discovery: {enabled: true, asLocalhost: true}
                 });
+
+                // console.log({identity});
+
                 try {
                     // Get the network (channel) our contract is deployed to.
                     const network = await gateway.getNetwork(myChannel);
@@ -122,7 +138,13 @@ export default class HyperledgerService {
     //     }
     // }
 
-    CreateCert = async (docToHash) => {
+    /**
+     * 
+     * @param {Buffer} docToHash 
+     * @param {String} userId 
+     * @returns 
+     */
+    CreateCert = async (docToHash, userId) => {
         fabricLogger.info('Submit Transaction: CreateCert() Create a new certificate');
         try {
             // calculate Hash from the specified file
@@ -131,7 +153,7 @@ export default class HyperledgerService {
             // console.log("Hash of the file: " + hashedDoc);
 
             // get signature to sign
-            const identity = await wallet.get(registerUser.ApplicationUserId);
+            const identity = await wallet.get(userId);
             const userPk = identity.credentials.privateKey;
 
             // console.log({userPk})
