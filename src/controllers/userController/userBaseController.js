@@ -39,7 +39,7 @@ const createUser = (payloadData, callback) => {
             if (data && data.length > 0) {
               if (data[0].emailVerified == true) cb(ERROR.USER_ALREADY_REGISTERED);
               else {
-                Service.UserService.deleteUser({ _id: data[0]._id }, (err, updatedData) => {
+                Service.UserService.deleteRecord({ _id: data[0]._id }, (err, updatedData) => {
                   if (err) cb(err);
                   else cb(null);
                 });
@@ -104,6 +104,15 @@ const createUser = (payloadData, callback) => {
             cb();
           }
         });
+      },
+      // Register app user to Hyperledger Fabric
+      (cb) => {
+        try {
+          Service.RegisterAppUser(customerData._id);
+          return cb();
+        } catch (err) {
+          cb(err);
+        }
       },
       //  (cb) => {
       //     //Send SMS to User
@@ -223,6 +232,7 @@ const verifyOTP = (payload, callback) => {
 
 const loginUser = (payloadData, callback) => {
   var userFound = false;
+  // let customerData;
   var accessToken = null;
   var successLogin = false;
   var updatedUserDetails = null;
@@ -236,6 +246,7 @@ const loginUser = (payloadData, callback) => {
           if (err) cb(err);
           else {
             userFound = (result && result[0]) || null;
+            // customerData = (result && result[0]) || null;
             cb();
           }
         });
@@ -252,9 +263,11 @@ const loginUser = (payloadData, callback) => {
               UniversalFunctions.CryptData(payloadData.password)
             ) {
               cb(ERROR.INCORRECT_PASSWORD);
-            } else if (userFound.emailVerified == false) {
-              cb(ERROR.NOT_REGISTERED);
-            } else {
+            } 
+            // else if (userFound.emailVerified == false) {
+            //   cb(ERROR.NOT_REGISTERED);
+            // } 
+            else {
               successLogin = true;
               cb();
             }
@@ -317,6 +330,15 @@ const loginUser = (payloadData, callback) => {
             }
           });
         } else cb(ERROR.IMP_ERROR);
+      },
+      (cb) => {
+        try{
+          Service.HyperledgerService.ConnectHyperledgerGateWay(userFound._id);
+          return cb();
+
+        } catch(err) {
+          return cb(err);
+        }
       },
       (cb) => {
         appVersion = {

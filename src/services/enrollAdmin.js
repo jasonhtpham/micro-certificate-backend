@@ -6,12 +6,19 @@
 
 'use strict';
 
+import 'dotenv/config';
+
 const FabricCAServices = require('fabric-ca-client');
 const { Wallets } = require('fabric-network');
 const fs = require('fs');
 const path = require('path');
-const adminUserId = 'admin';
-const adminUserPasswd = 'adminpw';
+
+const adminUserId = process.env.CA_ADMIN_ID;
+const adminUserPasswd = process.env.CA_ADMIN_PWD;
+
+const CA_ADDRESS = process.env.CA_ADDRESS;
+const MSP_ID = process.env.MSP_ID;
+
 const walletPath = path.join(__dirname, '..', 'wallet');
 
 async function enrollAdminUser() {
@@ -25,7 +32,7 @@ async function enrollAdminUser() {
         const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
 
         // Create a new CA client for interacting with the CA.
-        const caInfo = ccp.certificateAuthorities['ca.org1.example.com'];
+        const caInfo = ccp.certificateAuthorities[CA_ADDRESS];
         const caTLSCACerts = caInfo.tlsCACerts.pem;
         const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
 
@@ -46,7 +53,7 @@ async function enrollAdminUser() {
                 certificate: enrollment.certificate,
                 privateKey: enrollment.key.toBytes(),
             },
-            mspId: 'Org1MSP',
+            mspId: MSP_ID,
             type: 'X.509',
         };
         await wallet.put(adminUserId, x509Identity);
@@ -58,5 +65,5 @@ async function enrollAdminUser() {
     }
 }
 
-exports.AdminUserId = adminUserId;
-exports.EnrollAdminUser = enrollAdminUser;
+// exports.AdminUserId = adminUserId;
+export default enrollAdminUser;

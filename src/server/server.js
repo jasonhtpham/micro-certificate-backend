@@ -1,5 +1,6 @@
 import ServerHelper from "./helpers";
 import SocketManager from "../lib/socketManager";
+import Service from "../services";
 
 /**
  * @author Sanchit Dang
@@ -41,6 +42,9 @@ export const startMyServer = () => {
   ServerHelper.configureLog4js();
 
   ServerHelper.connectMongoDB();
+
+  // Enroll admin user of Hyperledger Fabric
+  Service.EnrollAdminUser();
 
   // Global variable to get app root folder path
   ServerHelper.setGlobalAppRoot();
